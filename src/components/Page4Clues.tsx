@@ -54,24 +54,24 @@ const Page4Clues = () => {
 
   const clues = [
     {
-      icon: "📅",
-      text: "The first day you met me — 8th November 2022",
+      icon: "💌",
+      text: "💌 Clue 1 — (Just for Effort)\n\n\"In every love story, there's a heartbeat that never forgets.\nSearch the place where we first met — not in space, but in your memories.\nSometimes, the simplest things whisper the loudest truths.\"\n\nHint: The answer isn't an object. It's a feeling or a moment.\n(Just meant to make her recall your first encounter — no numbers yet!)",
     },
     {
-      icon: "🪑",
-      text: "The 2nd bench — where everything started",
+      icon: "💞",
+      text: "💞 Clue 2 — (Just for Effort)\n\n\"Even Shakespeare said, 'Journeys end in lovers meeting.'\nThink of the journey that began with a smile,\nand ended with a laugh over something silly — find that photo or memory.\nThat's where the next step begins.\"\n\nHint: This clue connects to an inside joke, a memory you both share.",
     },
     {
-      icon: "💬",
-      text: "Our long chats — late nights, small laughs",
+      icon: "🧩",
+      text: "🧩 Clue 3 — (Digit 4) — Math Love\n\n\"Our love is like an equation of balance —\nWhen 2 hearts meet, they make 1 story.\nSolve this to find the first number in your key:\n\n💗 If (heart + smile) = infinity,\nand (you + me) = perfect square,\nthe smallest perfect square greater than 3×3 is your first digit.\"\n\nAnswer: 4 💕",
     },
     {
-      icon: "✉️",
-      text: "A message after 1½ years — still the same name",
+      icon: "💻",
+      text: "💻 Clue 4 — (Digit 9) — C.S. Fundamentals\n\n\"Love is like binary — it's either true or false, no middle ground.\nBut sometimes, 0s and 1s together make magic.\n\nConvert this to decimal to find the next number:\n💾 1001\"\n\nAnswer: 9 💗",
     },
     {
-      icon: "☕",
-      text: "Coffee ☕ — the place I'll be waiting if you find me",
+      icon: "💘",
+      text: "💘 Clue 5 — (Digit 1) — Love Language & Literature\n\n\"In The Notebook, Noah wrote letters for 365 days,\nOne for every sunrise he missed her.\n\nIf love is patient (💌),\nand patience is 'the first' of the love languages,\nthen the final number of your code is the first of all — what is it?\"\n\nAnswer: 1 💌\n\nCoffee ☕ — the place I'll be waiting if you find me",
     },
   ];
 
@@ -177,9 +177,9 @@ const Page4Clues = () => {
                 index < revealedClues ? "block" : "hidden"
               }`}
             >
-              <div className="flex items-center gap-4">
-                <span className="text-4xl">{clue.icon}</span>
-                <p className="text-left text-white font-light text-lg flex-1">
+              <div className="flex items-start gap-4">
+                <span className="text-4xl flex-shrink-0">{clue.icon}</span>
+                <p className="text-left text-white font-light text-base md:text-lg flex-1 whitespace-pre-line leading-relaxed">
                   {clue.text}
                 </p>
               </div>
