@@ -60,8 +60,8 @@ const Page4Clues = () => {
     {
       icon: "💌",
       text: "💌 Clue 1 — (Just for Effort)\n\n\"In every love story, there's a heartbeat that never forgets.\nSearch the place where we first met — not in space, but in your memories.\nSometimes, the simplest things whisper the loudest truths.\"\n\nHint: The answer isn't an object. It's a feeling or a moment.\n(Just meant to make her recall your first encounter — no numbers yet!)",
-      requiresAnswer: false,
-      correctAnswer: "",
+      requiresAnswer: true,
+      correctAnswer: "love",
     },
     {
       icon: "🧩",
@@ -84,8 +84,8 @@ const Page4Clues = () => {
     {
       icon: "💞",
       text: "💞 Clue 5 — (Just for Effort)\n\n\"Even Shakespeare said, 'Journeys end in lovers meeting.'\nThink of the journey that began with a smile,\nand ended with a laugh over something silly — find that photo or memory.\nThat's where the next step begins.\"\n\nHint: This clue connects to an inside joke, a memory you both share.",
-      requiresAnswer: false,
-      correctAnswer: "",
+      requiresAnswer: true,
+      correctAnswer: "coffee",
     },
   ];
 
