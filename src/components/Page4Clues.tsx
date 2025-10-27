@@ -90,11 +90,11 @@ const Page4Clues = () => {
   ];
 
   const revealNextClue = () => {
-    if (revealedClues >= clues.length || !canReveal) return;
+    if (revealedClues >= clues.length) return;
 
     const currentClue = clues[revealedClues];
     
-    // If clue requires answer, validate it
+    // If clue requires answer, validate it first (no cooldown check for wrong answers)
     if (currentClue.requiresAnswer) {
       if (currentAnswer.trim() === "") {
         toast({
@@ -114,10 +114,30 @@ const Page4Clues = () => {
         return;
       }
       
+      // Check cooldown only AFTER correct answer
+      if (!canReveal) {
+        toast({
+          title: "Please wait",
+          description: "Next clue will be available after the cooldown",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Correct! ✨",
         description: "Moving to the next clue...",
       });
+    } else {
+      // For clues without answers, check cooldown before revealing
+      if (!canReveal) {
+        toast({
+          title: "Please wait",
+          description: "Next clue will be available after the cooldown",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     const newTimestamps = [...clueTimestamps, Date.now()];
@@ -253,12 +273,12 @@ const Page4Clues = () => {
             <Button
               onClick={revealNextClue}
               size="lg"
-              disabled={!canReveal}
+              disabled={clues[revealedClues]?.requiresAnswer ? false : !canReveal}
               className="bg-accent hover:bg-accent/90 text-accent-foreground font-medium text-lg px-10 py-6 rounded-full shadow-heart transition-bounce disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {clues[revealedClues]?.requiresAnswer ? "Submit Answer" : `Reveal Clue ${revealedClues + 1}`} ✨
             </Button>
-            {!canReveal && (
+            {!canReveal && !clues[revealedClues]?.requiresAnswer && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
