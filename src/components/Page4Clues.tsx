@@ -1,10 +1,56 @@
 import { motion } from "framer-motion";
-import { Coffee, Sparkles } from "lucide-react";
+import { Coffee, Sparkles, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Page4Clues = () => {
   const [revealedClues, setRevealedClues] = useState<number>(0);
+  const [clueTimestamps, setClueTimestamps] = useState<number[]>([]);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [canReveal, setCanReveal] = useState<boolean>(true);
+
+  // Load timestamps from localStorage on mount
+  useEffect(() => {
+    const savedTimestamps = localStorage.getItem("clueTimestamps");
+    if (savedTimestamps) {
+      const timestamps = JSON.parse(savedTimestamps);
+      setClueTimestamps(timestamps);
+      setRevealedClues(timestamps.length);
+    }
+  }, []);
+
+  // Check if 24 hours have passed since last reveal
+  useEffect(() => {
+    const checkTimeRemaining = () => {
+      if (clueTimestamps.length === 0) {
+        setCanReveal(true);
+        setTimeRemaining("");
+        return;
+      }
+
+      const lastTimestamp = clueTimestamps[clueTimestamps.length - 1];
+      const now = Date.now();
+      const hoursInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      const timeSinceLastReveal = now - lastTimestamp;
+
+      if (timeSinceLastReveal >= hoursInMs) {
+        setCanReveal(true);
+        setTimeRemaining("");
+      } else {
+        setCanReveal(false);
+        const remaining = hoursInMs - timeSinceLastReveal;
+        const hours = Math.floor(remaining / (60 * 60 * 1000));
+        const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+        setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`);
+      }
+    };
+
+    checkTimeRemaining();
+    const interval = setInterval(checkTimeRemaining, 1000);
+
+    return () => clearInterval(interval);
+  }, [clueTimestamps]);
 
   const clues = [
     {
@@ -30,8 +76,11 @@ const Page4Clues = () => {
   ];
 
   const revealNextClue = () => {
-    if (revealedClues < clues.length) {
+    if (revealedClues < clues.length && canReveal) {
+      const newTimestamps = [...clueTimestamps, Date.now()];
+      setClueTimestamps(newTimestamps);
       setRevealedClues(revealedClues + 1);
+      localStorage.setItem("clueTimestamps", JSON.stringify(newTimestamps));
     }
   };
 
@@ -143,14 +192,31 @@ const Page4Clues = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 1, type: "spring", stiffness: 200 }}
+            className="space-y-4"
           >
             <Button
               onClick={revealNextClue}
               size="lg"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground font-medium text-lg px-10 py-6 rounded-full shadow-heart transition-bounce"
+              disabled={!canReveal}
+              className="bg-accent hover:bg-accent/90 text-accent-foreground font-medium text-lg px-10 py-6 rounded-full shadow-heart transition-bounce disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Reveal Clue {revealedClues + 1} ✨
             </Button>
+            {!canReveal && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20"
+              >
+                <Clock className="text-accent mx-auto mb-2" size={30} />
+                <p className="text-white/90 text-sm font-light">
+                  Next clue available in:
+                </p>
+                <p className="text-accent text-xl font-semibold mt-1">
+                  {timeRemaining}
+                </p>
+              </motion.div>
+            )}
           </motion.div>
         ) : (
           <motion.div
