@@ -1,13 +1,17 @@
 import { motion } from "framer-motion";
 import { Coffee, Sparkles, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Page4Clues = () => {
   const [revealedClues, setRevealedClues] = useState<number>(0);
   const [clueTimestamps, setClueTimestamps] = useState<number[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [canReveal, setCanReveal] = useState<boolean>(true);
+  const [currentAnswer, setCurrentAnswer] = useState<string>("");
+  const { toast } = useToast();
 
   // Load timestamps from localStorage on mount
   useEffect(() => {
@@ -56,32 +60,71 @@ const Page4Clues = () => {
     {
       icon: "💌",
       text: "💌 Clue 1 — (Just for Effort)\n\n\"In every love story, there's a heartbeat that never forgets.\nSearch the place where we first met — not in space, but in your memories.\nSometimes, the simplest things whisper the loudest truths.\"\n\nHint: The answer isn't an object. It's a feeling or a moment.\n(Just meant to make her recall your first encounter — no numbers yet!)",
-    },
-    {
-      icon: "💞",
-      text: "💞 Clue 2 — (Just for Effort)\n\n\"Even Shakespeare said, 'Journeys end in lovers meeting.'\nThink of the journey that began with a smile,\nand ended with a laugh over something silly — find that photo or memory.\nThat's where the next step begins.\"\n\nHint: This clue connects to an inside joke, a memory you both share.",
+      requiresAnswer: false,
+      correctAnswer: "",
     },
     {
       icon: "🧩",
-      text: "🧩 Clue 3 — (Digit 4) — Math Love\n\n\"Our love is like an equation of balance —\nWhen 2 hearts meet, they make 1 story.\nSolve this to find the first number in your key:\n\n💗 If (heart + smile) = infinity,\nand (you + me) = perfect square,\nthe smallest perfect square greater than 3×3 is your first digit.\"\n\nAnswer: 4 💕",
+      text: "🧩 Clue 2 — (Digit 4) — Math Love\n\n\"Our love is like an equation of balance —\nWhen 2 hearts meet, they make 1 story.\nSolve this to find the first number in your key:\n\n💗 If (heart + smile) = infinity,\nand (you + me) = perfect square,\nthe smallest perfect square greater than 3×3 is your first digit.\"",
+      requiresAnswer: true,
+      correctAnswer: "4",
     },
     {
       icon: "💻",
-      text: "💻 Clue 4 — (Digit 9) — C.S. Fundamentals\n\n\"Love is like binary — it's either true or false, no middle ground.\nBut sometimes, 0s and 1s together make magic.\n\nConvert this to decimal to find the next number:\n💾 1001\"\n\nAnswer: 9 💗",
+      text: "💻 Clue 3 — (Digit 9) — C.S. Fundamentals\n\n\"Love is like binary — it's either true or false, no middle ground.\nBut sometimes, 0s and 1s together make magic.\n\nConvert this to decimal to find the next number:\n💾 1001\"",
+      requiresAnswer: true,
+      correctAnswer: "9",
     },
     {
       icon: "💘",
-      text: "💘 Clue 5 — (Digit 1) — Love Language & Literature\n\n\"In The Notebook, Noah wrote letters for 365 days,\nOne for every sunrise he missed her.\n\nIf love is patient (💌),\nand patience is 'the first' of the love languages,\nthen the final number of your code is the first of all — what is it?\"\n\nAnswer: 1 💌\n\nCoffee ☕ — the place I'll be waiting if you find me",
+      text: "💘 Clue 4 — (Digit 1) — Love Language & Literature\n\n\"In The Notebook, Noah wrote letters for 365 days,\nOne for every sunrise he missed her.\n\nIf love is patient (💌),\nand patience is 'the first' of the love languages,\nthen the final number of your code is the first of all — what is it?\"",
+      requiresAnswer: true,
+      correctAnswer: "1",
+    },
+    {
+      icon: "💞",
+      text: "💞 Clue 5 — (Just for Effort)\n\n\"Even Shakespeare said, 'Journeys end in lovers meeting.'\nThink of the journey that began with a smile,\nand ended with a laugh over something silly — find that photo or memory.\nThat's where the next step begins.\"\n\nHint: This clue connects to an inside joke, a memory you both share.",
+      requiresAnswer: false,
+      correctAnswer: "",
     },
   ];
 
   const revealNextClue = () => {
-    if (revealedClues < clues.length && canReveal) {
-      const newTimestamps = [...clueTimestamps, Date.now()];
-      setClueTimestamps(newTimestamps);
-      setRevealedClues(revealedClues + 1);
-      localStorage.setItem("clueTimestamps", JSON.stringify(newTimestamps));
+    if (revealedClues >= clues.length || !canReveal) return;
+
+    const currentClue = clues[revealedClues];
+    
+    // If clue requires answer, validate it
+    if (currentClue.requiresAnswer) {
+      if (currentAnswer.trim() === "") {
+        toast({
+          title: "Please enter an answer",
+          description: "Type your answer to reveal the next clue",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (currentAnswer.trim() !== currentClue.correctAnswer) {
+        toast({
+          title: "Incorrect answer",
+          description: "Try again! Think carefully about the clue 💭",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Correct! ✨",
+        description: "Moving to the next clue...",
+      });
     }
+
+    const newTimestamps = [...clueTimestamps, Date.now()];
+    setClueTimestamps(newTimestamps);
+    setRevealedClues(revealedClues + 1);
+    setCurrentAnswer("");
+    localStorage.setItem("clueTimestamps", JSON.stringify(newTimestamps));
   };
 
   return (
@@ -194,13 +237,26 @@ const Page4Clues = () => {
             transition={{ delay: 1, type: "spring", stiffness: 200 }}
             className="space-y-4"
           >
+            {clues[revealedClues]?.requiresAnswer && (
+              <div className="max-w-md mx-auto space-y-3">
+                <Input
+                  type="text"
+                  placeholder="Type your answer..."
+                  value={currentAnswer}
+                  onChange={(e) => setCurrentAnswer(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && revealNextClue()}
+                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50 text-center text-xl py-6"
+                  maxLength={10}
+                />
+              </div>
+            )}
             <Button
               onClick={revealNextClue}
               size="lg"
               disabled={!canReveal}
               className="bg-accent hover:bg-accent/90 text-accent-foreground font-medium text-lg px-10 py-6 rounded-full shadow-heart transition-bounce disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Reveal Clue {revealedClues + 1} ✨
+              {clues[revealedClues]?.requiresAnswer ? "Submit Answer" : `Reveal Clue ${revealedClues + 1}`} ✨
             </Button>
             {!canReveal && (
               <motion.div
